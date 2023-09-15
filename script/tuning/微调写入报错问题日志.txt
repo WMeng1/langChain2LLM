@@ -1,0 +1,540 @@
+root@autodl-container-7ae1118e3c-6205ffc5:~/autodl-tmp/workspace/Chinese-LLaMA-Alpaca-2/scripts/training# sh run_sft.sh
+[2023-09-15 16:22:36,862] [INFO] [real_accelerator.py:158:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2023-09-15 16:22:40,720] [INFO] [comm.py:637:init_distributed] cdb=None
+[2023-09-15 16:22:40,720] [INFO] [comm.py:668:init_distributed] Initializing TorchBackend in DeepSpeed with backend nccl
+09/15/2023 16:24:51 - WARNING - __main__ - Process rank: 0, device: cuda:0, n_gpu: 1distributed training: True, 16-bits training: True
+[INFO|configuration_utils.py:710] 2023-09-15 16:24:51,027 >> loading configuration file /root/autodl-tmp/workspace/models/chinese-alpaca-2-7b/config.json
+[INFO|configuration_utils.py:768] 2023-09-15 16:24:51,034 >> Model config LlamaConfig {
+  "_name_or_path": "/root/autodl-tmp/workspace/models/chinese-alpaca-2-7b/",
+  "architectures": [
+    "LlamaForCausalLM"
+  ],
+  "bos_token_id": 1,
+  "eos_token_id": 2,
+  "hidden_act": "silu",
+  "hidden_size": 4096,
+  "initializer_range": 0.02,
+  "intermediate_size": 11008,
+  "max_position_embeddings": 4096,
+  "model_type": "llama",
+  "num_attention_heads": 32,
+  "num_hidden_layers": 32,
+  "num_key_value_heads": 32,
+  "pad_token_id": 0,
+  "pretraining_tp": 1,
+  "rms_norm_eps": 1e-05,
+  "rope_scaling": null,
+  "tie_word_embeddings": false,
+  "torch_dtype": "float16",
+  "transformers_version": "4.31.0",
+  "use_cache": true,
+  "vocab_size": 55296
+}
+
+[INFO|tokenization_utils_base.py:1837] 2023-09-15 16:24:51,035 >> loading file tokenizer.model
+[INFO|tokenization_utils_base.py:1837] 2023-09-15 16:24:51,035 >> loading file added_tokens.json
+[INFO|tokenization_utils_base.py:1837] 2023-09-15 16:24:51,035 >> loading file special_tokens_map.json
+[INFO|tokenization_utils_base.py:1837] 2023-09-15 16:24:51,035 >> loading file tokenizer_config.json
+[WARNING|logging.py:295] 2023-09-15 16:24:51,036 >> You are using the legacy behaviour of the <class 'transformers.models.llama.tokenization_llama.LlamaTokenizer'>. This means that tokens that come after special tokens will not be properly handled. We recommend you to read the related pull request available at https://github.com/huggingface/transformers/pull/24565
+09/15/2023 16:24:51 - INFO - __main__ - Training files: /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train.json
+09/15/2023 16:24:51 - WARNING - root - building dataset...
+Using custom data configuration default-c9b541bed872e5b2
+09/15/2023 16:25:02 - INFO - datasets.builder - Using custom data configuration default-c9b541bed872e5b2
+Loading Dataset Infos from /root/miniconda3/lib/python3.8/site-packages/datasets/packaged_modules/json
+09/15/2023 16:25:02 - INFO - datasets.info - Loading Dataset Infos from /root/miniconda3/lib/python3.8/site-packages/datasets/packaged_modules/json
+Generating dataset json (/root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96)
+09/15/2023 16:25:02 - INFO - datasets.builder - Generating dataset json (/root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96)
+Downloading and preparing dataset json/default to /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96...
+09/15/2023 16:25:02 - INFO - datasets.builder - Downloading and preparing dataset json/default to /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96...
+Downloading data files: 100%|███████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 7710.12it/s]
+Downloading took 0.0 min
+09/15/2023 16:25:02 - INFO - datasets.download.download_manager - Downloading took 0.0 min
+Checksum Computation took 0.0 min
+09/15/2023 16:25:02 - INFO - datasets.download.download_manager - Checksum Computation took 0.0 min
+Extracting data files: 100%|████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 1146.30it/s]
+Generating train split
+09/15/2023 16:25:02 - INFO - datasets.builder - Generating train split
+Generating train split: 14164 examples [00:00, 89504.17 examples/s]
+Unable to verify splits sizes.
+09/15/2023 16:25:02 - INFO - datasets.utils.info_utils - Unable to verify splits sizes.
+Dataset json downloaded and prepared to /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96. Subsequent calls will reuse this data.
+09/15/2023 16:25:02 - INFO - datasets.builder - Dataset json downloaded and prepared to /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96. Subsequent calls will reuse this data.
+Process #0 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00000_of_00008.arrow
+09/15/2023 16:25:02 - INFO - datasets.arrow_dataset - Process #0 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00000_of_00008.arrow
+Process #1 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00001_of_00008.arrow
+09/15/2023 16:25:02 - INFO - datasets.arrow_dataset - Process #1 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00001_of_00008.arrow
+Process #2 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00002_of_00008.arrow
+09/15/2023 16:25:02 - INFO - datasets.arrow_dataset - Process #2 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00002_of_00008.arrow
+Process #3 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00003_of_00008.arrow
+09/15/2023 16:25:02 - INFO - datasets.arrow_dataset - Process #3 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00003_of_00008.arrow
+Process #4 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00004_of_00008.arrow
+09/15/2023 16:25:02 - INFO - datasets.arrow_dataset - Process #4 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00004_of_00008.arrow
+Process #5 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00005_of_00008.arrow
+09/15/2023 16:25:02 - INFO - datasets.arrow_dataset - Process #5 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00005_of_00008.arrow
+Process #6 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00006_of_00008.arrow
+09/15/2023 16:25:02 - INFO - datasets.arrow_dataset - Process #6 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00006_of_00008.arrow
+Process #7 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00007_of_00008.arrow
+09/15/2023 16:25:02 - INFO - datasets.arrow_dataset - Process #7 will write at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00007_of_00008.arrow
+Spawning 8 processes
+09/15/2023 16:25:02 - INFO - datasets.arrow_dataset - Spawning 8 processes
+preprocessing on dataset (num_proc=8):   0%|                                                                           | 0/14164 [00:00<?, ? examples/s]Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00003_of_00008.arrow
+09/15/2023 16:25:03 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00003_of_00008.arrow
+preprocessing on dataset (num_proc=8):   7%|████▍                                                         | 1000/14164 [00:00<00:07, 1695.59 examples/s]Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00002_of_00008.arrow
+09/15/2023 16:25:03 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00002_of_00008.arrow
+preprocessing on dataset (num_proc=8):  14%|████████▊                                                     | 2000/14164 [00:00<00:05, 2297.94 examples/s]Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00007_of_00008.arrow
+09/15/2023 16:25:03 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00007_of_00008.arrow
+preprocessing on dataset (num_proc=8):  27%|████████████████▌                                             | 3771/14164 [00:01<00:02, 4462.62 examples/s]Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00001_of_00008.arrow
+09/15/2023 16:25:03 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00001_of_00008.arrow
+Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00004_of_00008.arrow
+09/15/2023 16:25:03 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00004_of_00008.arrow
+Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00006_of_00008.arrow
+09/15/2023 16:25:03 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00006_of_00008.arrow
+preprocessing on dataset (num_proc=8):  41%|█████████████████████████▎                                    | 5771/14164 [00:01<00:01, 6689.42 examples/s]Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00005_of_00008.arrow
+09/15/2023 16:25:03 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00005_of_00008.arrow
+Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00000_of_00008.arrow
+09/15/2023 16:25:03 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/train/HC3_Chinese_Human_train_512/json/default-c9b541bed872e5b2/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-fae010f9d6c3a3fb_00000_of_00008.arrow
+preprocessing on dataset (num_proc=8): 100%|█████████████████████████████████████████████████████████████| 14164/14164 [00:02<00:00, 6375.83 examples/s]
+Concatenating 8 shards
+09/15/2023 16:25:04 - INFO - datasets.arrow_dataset - Concatenating 8 shards
+Saving the dataset (1/1 shards): 100%|█████████████████████████████████████████████████████████████████| 14164/14164 [00:00<00:00, 563206.25 examples/s]
+09/15/2023 16:25:04 - INFO - __main__ - Num train_samples  14164
+09/15/2023 16:25:04 - INFO - __main__ - Training example:
+09/15/2023 16:25:04 - INFO - __main__ - <s> [INST] <<SYS>>
+You are a helpful assistant. 你是一个乐于助人的助手。
+<</SYS>>
+
+我有一个计算机相关的问题，请用中文回答，什么是 信息科学技术 [/INST] 信息科学技术专业是一个大学专业，培养具有扎实的数学、物理、电子和计算机的基础知识，系统地掌握光学信息处理技术、现代电子学技术和计算机应用技术的基本技能，能在光通信、光学信息处理、以及相关的电子信息科学、计算机科学等信息技术领域、特别是光机电算一体化产业从事科学研究、产品设计和开发、生产技术或管理的面向二十一世纪的高级专门人才。</s>
+09/15/2023 16:25:04 - INFO - __main__ - Evaluation files: /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid.json
+09/15/2023 16:25:04 - WARNING - root - building dataset...
+Using custom data configuration default-8dade909bccf3992
+09/15/2023 16:25:06 - INFO - datasets.builder - Using custom data configuration default-8dade909bccf3992
+Loading Dataset Infos from /root/miniconda3/lib/python3.8/site-packages/datasets/packaged_modules/json
+09/15/2023 16:25:06 - INFO - datasets.info - Loading Dataset Infos from /root/miniconda3/lib/python3.8/site-packages/datasets/packaged_modules/json
+Generating dataset json (/root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96)
+09/15/2023 16:25:06 - INFO - datasets.builder - Generating dataset json (/root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96)
+Downloading and preparing dataset json/default to /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96...
+09/15/2023 16:25:06 - INFO - datasets.builder - Downloading and preparing dataset json/default to /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96...
+Downloading data files: 100%|███████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 4629.47it/s]
+Downloading took 0.0 min
+09/15/2023 16:25:06 - INFO - datasets.download.download_manager - Downloading took 0.0 min
+Checksum Computation took 0.0 min
+09/15/2023 16:25:06 - INFO - datasets.download.download_manager - Checksum Computation took 0.0 min
+Extracting data files: 100%|████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00, 1188.19it/s]
+Generating train split
+09/15/2023 16:25:06 - INFO - datasets.builder - Generating train split
+Generating train split: 8068 examples [00:00, 98231.99 examples/s]
+Unable to verify splits sizes.
+09/15/2023 16:25:06 - INFO - datasets.utils.info_utils - Unable to verify splits sizes.
+Dataset json downloaded and prepared to /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96. Subsequent calls will reuse this data.
+09/15/2023 16:25:06 - INFO - datasets.builder - Dataset json downloaded and prepared to /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96. Subsequent calls will reuse this data.
+Process #0 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00000_of_00008.arrow
+09/15/2023 16:25:06 - INFO - datasets.arrow_dataset - Process #0 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00000_of_00008.arrow
+Process #1 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00001_of_00008.arrow
+09/15/2023 16:25:06 - INFO - datasets.arrow_dataset - Process #1 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00001_of_00008.arrow
+Process #2 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00002_of_00008.arrow
+09/15/2023 16:25:06 - INFO - datasets.arrow_dataset - Process #2 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00002_of_00008.arrow
+Process #3 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00003_of_00008.arrow
+09/15/2023 16:25:06 - INFO - datasets.arrow_dataset - Process #3 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00003_of_00008.arrow
+Process #4 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00004_of_00008.arrow
+09/15/2023 16:25:06 - INFO - datasets.arrow_dataset - Process #4 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00004_of_00008.arrow
+Process #5 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00005_of_00008.arrow
+09/15/2023 16:25:06 - INFO - datasets.arrow_dataset - Process #5 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00005_of_00008.arrow
+Process #6 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00006_of_00008.arrow
+09/15/2023 16:25:06 - INFO - datasets.arrow_dataset - Process #6 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00006_of_00008.arrow
+Process #7 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00007_of_00008.arrow
+09/15/2023 16:25:06 - INFO - datasets.arrow_dataset - Process #7 will write at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00007_of_00008.arrow
+Spawning 8 processes
+09/15/2023 16:25:06 - INFO - datasets.arrow_dataset - Spawning 8 processes
+preprocessing on dataset (num_proc=8):   0%|                                                                            | 0/8068 [00:00<?, ? examples/s]Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00000_of_00008.arrow
+09/15/2023 16:25:07 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00000_of_00008.arrow
+Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00002_of_00008.arrow
+09/15/2023 16:25:07 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00002_of_00008.arrow
+preprocessing on dataset (num_proc=8):  12%|███████▊                                                       | 1000/8068 [00:00<00:06, 1163.93 examples/s]Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00007_of_00008.arrow
+09/15/2023 16:25:07 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00007_of_00008.arrow
+preprocessing on dataset (num_proc=8):  37%|███████████████████████▌                                       | 3018/8068 [00:01<00:01, 3275.85 examples/s]Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00001_of_00008.arrow
+09/15/2023 16:25:07 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00001_of_00008.arrow
+Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00004_of_00008.arrow
+09/15/2023 16:25:07 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00004_of_00008.arrow
+Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00005_of_00008.arrow
+09/15/2023 16:25:07 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00005_of_00008.arrow
+Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00006_of_00008.arrow
+09/15/2023 16:25:07 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00006_of_00008.arrow
+Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00003_of_00008.arrow
+09/15/2023 16:25:07 - INFO - datasets.arrow_dataset - Caching processed dataset at /root/autodl-tmp/workspace/datasets/HC3_Chinese_Human_valid_512/json/default-8dade909bccf3992/0.0.0/8bb11242116d547c741b2e8a1f18598ffdd40a1d4f2a2872c7a28b697434bc96/cache-a09a099c8b03b037_00003_of_00008.arrow
+preprocessing on dataset (num_proc=8): 100%|███████████████████████████████████████████████████████████████| 8068/8068 [00:01<00:00, 6056.15 examples/s]
+Concatenating 8 shards
+09/15/2023 16:25:07 - INFO - datasets.arrow_dataset - Concatenating 8 shards
+Saving the dataset (1/1 shards): 100%|███████████████████████████████████████████████████████████████████| 8068/8068 [00:00<00:00, 347486.70 examples/s]
+09/15/2023 16:25:07 - INFO - __main__ - Num eval_samples  8068
+09/15/2023 16:25:07 - INFO - __main__ - Evaluation example:
+09/15/2023 16:25:07 - INFO - __main__ - <s> [INST] <<SYS>>
+You are a helpful assistant. 你是一个乐于助人的助手。
+<</SYS>>
+
+盗贼天赋盗贼怎么加天赋?知道告诉一下下啦~~  [/INST] 搞匕首还加出血（楼上）？
+天赋看你喜爱了，31 8 12 和  21 8 22 PK都好，
+17 34 是团队副本贼，玩输出的，武器建议1匕首1剑。</s>
+[INFO|modeling_utils.py:2600] 2023-09-15 16:25:07,727 >> loading weights file /root/autodl-tmp/workspace/models/chinese-alpaca-2-7b/pytorch_model.bin.index.json
+[INFO|modeling_utils.py:1172] 2023-09-15 16:25:07,728 >> Instantiating LlamaForCausalLM model under default dtype torch.float16.
+[INFO|configuration_utils.py:599] 2023-09-15 16:25:07,729 >> Generate config GenerationConfig {
+  "_from_model_config": true,
+  "bos_token_id": 1,
+  "eos_token_id": 2,
+  "pad_token_id": 0,
+  "transformers_version": "4.31.0"
+}
+
+Loading checkpoint shards: 100%|██████████████████████████████████████████████████████████████████████████████████████████| 2/2 [00:12<00:00,  6.17s/it]
+[INFO|modeling_utils.py:3329] 2023-09-15 16:25:20,314 >> All model checkpoint weights were used when initializing LlamaForCausalLM.
+
+[INFO|modeling_utils.py:3337] 2023-09-15 16:25:20,315 >> All the weights of LlamaForCausalLM were initialized from the model checkpoint at /root/autodl-tmp/workspace/models/chinese-alpaca-2-7b/.
+If your task is similar to the task the model of the checkpoint was trained on, you can already use LlamaForCausalLM for predictions without further training.
+[INFO|configuration_utils.py:559] 2023-09-15 16:25:20,318 >> loading configuration file /root/autodl-tmp/workspace/models/chinese-alpaca-2-7b/generation_config.json
+[INFO|configuration_utils.py:599] 2023-09-15 16:25:20,318 >> Generate config GenerationConfig {
+  "_from_model_config": true,
+  "bos_token_id": 1,
+  "eos_token_id": 2,
+  "pad_token_id": 0,
+  "transformers_version": "4.31.0"
+}
+
+09/15/2023 16:25:20 - INFO - __main__ - Model vocab size: 55296
+09/15/2023 16:25:20 - INFO - __main__ - len(tokenizer):55296
+09/15/2023 16:25:20 - INFO - __main__ - Init new peft model
+09/15/2023 16:25:20 - INFO - __main__ - target_modules: ['q_proj', 'v_proj', 'k_proj', 'o_proj', 'gate_proj', 'down_proj', 'up_proj']
+09/15/2023 16:25:20 - INFO - __main__ - lora_rank: 64
+trainable params: 159907840 || all params: 7089164288 || trainable%: 2.2556655975751596
+09/15/2023 16:27:09 - INFO - __main__ - model.modules_to_save: None
+[INFO|trainer.py:386] 2023-09-15 16:27:09,808 >> You have loaded a model on multiple GPUs. `is_model_parallel` attribute will be force-set to `True` to avoid any unexpected behavior such as device placement mismatching.
+/root/miniconda3/lib/python3.8/site-packages/transformers/optimization.py:411: FutureWarning: This implementation of AdamW is deprecated and will be removed in a future version. Use the PyTorch implementation torch.optim.AdamW instead, or set `no_deprecation_warning=True` to disable this warning
+  warnings.warn(
+[2023-09-15 16:27:09,980] [INFO] [logging.py:96:log_dist] [Rank 0] DeepSpeed info: version=0.10.3, git-hash=unknown, git-branch=unknown
+09/15/2023 16:27:10 - INFO - torch.distributed.distributed_c10d - Added key: store_based_barrier_key:2 to store for rank: 0
+09/15/2023 16:27:10 - INFO - torch.distributed.distributed_c10d - Rank 0: Completed store-based barrier for key:store_based_barrier_key:2 with 1 nodes.
+[2023-09-15 16:27:10,246] [INFO] [logging.py:96:log_dist] [Rank 0] DeepSpeed Flops Profiler Enabled: False
+[2023-09-15 16:27:10,249] [INFO] [logging.py:96:log_dist] [Rank 0] Removing param_group that has no 'params' in the client Optimizer
+[2023-09-15 16:27:10,249] [INFO] [logging.py:96:log_dist] [Rank 0] Using client Optimizer as basic optimizer
+[2023-09-15 16:27:10,305] [INFO] [logging.py:96:log_dist] [Rank 0] DeepSpeed Basic Optimizer = AdamW
+[2023-09-15 16:27:10,305] [INFO] [utils.py:54:is_zero_supported_optimizer] Checking ZeRO support for optimizer=AdamW type=<class 'transformers.optimization.AdamW'>
+[2023-09-15 16:27:10,305] [WARNING] [engine.py:1149:_do_optimizer_sanity_check] **** You are using ZeRO with an untested optimizer, proceed with caution *****
+[2023-09-15 16:27:10,305] [INFO] [logging.py:96:log_dist] [Rank 0] Creating torch.float16 ZeRO stage 2 optimizer
+[2023-09-15 16:27:10,305] [INFO] [stage_1_and_2.py:146:__init__] Reduce bucket size 100000000
+[2023-09-15 16:27:10,305] [INFO] [stage_1_and_2.py:147:__init__] Allgather bucket size 100000000
+[2023-09-15 16:27:10,305] [INFO] [stage_1_and_2.py:148:__init__] CPU Offload: False
+[2023-09-15 16:27:10,305] [INFO] [stage_1_and_2.py:149:__init__] Round robin gradient partitioning: False
+Rank: 0 partition count [1] and sizes[(159907840, False)]
+[2023-09-15 16:27:10,704] [INFO] [utils.py:803:see_memory_usage] Before initializing optimizer states
+[2023-09-15 16:27:10,705] [INFO] [utils.py:804:see_memory_usage] MA 13.86 GB         Max_MA 14.16 GB         CA 14.16 GB         Max_CA 14 GB
+[2023-09-15 16:27:10,706] [INFO] [utils.py:811:see_memory_usage] CPU Virtual Memory:  used = 31.78 GB, percent = 8.4%
+[2023-09-15 16:27:10,815] [INFO] [utils.py:803:see_memory_usage] After initializing optimizer states
+[2023-09-15 16:27:10,816] [INFO] [utils.py:804:see_memory_usage] MA 15.06 GB         Max_MA 16.25 GB         CA 16.55 GB         Max_CA 17 GB
+[2023-09-15 16:27:10,816] [INFO] [utils.py:811:see_memory_usage] CPU Virtual Memory:  used = 31.81 GB, percent = 8.4%
+[2023-09-15 16:27:10,816] [INFO] [stage_1_and_2.py:520:__init__] optimizer state initialized
+[2023-09-15 16:27:10,906] [INFO] [utils.py:803:see_memory_usage] After initializing ZeRO optimizer
+[2023-09-15 16:27:10,907] [INFO] [utils.py:804:see_memory_usage] MA 15.06 GB         Max_MA 15.06 GB         CA 16.55 GB         Max_CA 17 GB
+[2023-09-15 16:27:10,907] [INFO] [utils.py:811:see_memory_usage] CPU Virtual Memory:  used = 31.73 GB, percent = 8.4%
+[2023-09-15 16:27:10,920] [INFO] [logging.py:96:log_dist] [Rank 0] DeepSpeed Final Optimizer = AdamW
+[2023-09-15 16:27:10,920] [INFO] [logging.py:96:log_dist] [Rank 0] DeepSpeed using client LR scheduler
+[2023-09-15 16:27:10,920] [INFO] [logging.py:96:log_dist] [Rank 0] DeepSpeed LR Scheduler = None
+[2023-09-15 16:27:10,920] [INFO] [logging.py:96:log_dist] [Rank 0] step=0, skipped=0, lr=[0.0], mom=[(0.9, 0.999)]
+[2023-09-15 16:27:10,922] [INFO] [config.py:967:print] DeepSpeedEngine configuration:
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   activation_checkpointing_config  {
+    "partition_activations": false,
+    "contiguous_memory_optimization": false,
+    "cpu_checkpointing": false,
+    "number_checkpoints": null,
+    "synchronize_checkpoint_boundary": false,
+    "profile": false
+}
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   aio_config ................... {'block_size': 1048576, 'queue_depth': 8, 'thread_count': 1, 'single_submit': False, 'overlap_events': True}
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   amp_enabled .................. False
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   amp_params ................... False
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   autotuning_config ............ {
+    "enabled": false,
+    "start_step": null,
+    "end_step": null,
+    "metric_path": null,
+    "arg_mappings": null,
+    "metric": "throughput",
+    "model_info": null,
+    "results_dir": "autotuning_results",
+    "exps_dir": "autotuning_exps",
+    "overwrite": true,
+    "fast": true,
+    "start_profile_step": 3,
+    "end_profile_step": 5,
+    "tuner_type": "gridsearch",
+    "tuner_early_stopping": 5,
+    "tuner_num_trials": 50,
+    "model_info_path": null,
+    "mp_size": 1,
+    "max_train_batch_size": null,
+    "min_train_batch_size": 1,
+    "max_train_micro_batch_size_per_gpu": 1.024000e+03,
+    "min_train_micro_batch_size_per_gpu": 1,
+    "num_tuning_micro_batch_sizes": 3
+}
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   bfloat16_enabled ............. False
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   checkpoint_parallel_write_pipeline  False
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   checkpoint_tag_validation_enabled  True
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   checkpoint_tag_validation_fail  False
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   comms_config ................. <deepspeed.comm.config.DeepSpeedCommsConfig object at 0x7fac5b013be0>
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   communication_data_type ...... None
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   compression_config ........... {'weight_quantization': {'shared_parameters': {'enabled': False, 'quantizer_kernel': False, 'schedule_offset': 0, 'quantize_groups': 1, 'quantize_verbose': False, 'quantization_type': 'symmetric', 'quantize_weight_in_forward': False, 'rounding': 'nearest', 'fp16_mixed_quantize': False, 'quantize_change_ratio': 0.001}, 'different_groups': {}}, 'activation_quantization': {'shared_parameters': {'enabled': False, 'quantization_type': 'symmetric', 'range_calibration': 'dynamic', 'schedule_offset': 1000}, 'different_groups': {}}, 'sparse_pruning': {'shared_parameters': {'enabled': False, 'method': 'l1', 'schedule_offset': 1000}, 'different_groups': {}}, 'row_pruning': {'shared_parameters': {'enabled': False, 'method': 'l1', 'schedule_offset': 1000}, 'different_groups': {}}, 'head_pruning': {'shared_parameters': {'enabled': False, 'method': 'topk', 'schedule_offset': 1000}, 'different_groups': {}}, 'channel_pruning': {'shared_parameters': {'enabled': False, 'method': 'l1', 'schedule_offset': 1000}, 'different_groups': {}}, 'layer_reduction': {'enabled': False}}
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   curriculum_enabled_legacy .... False
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   curriculum_params_legacy ..... False
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   data_efficiency_config ....... {'enabled': False, 'seed': 1234, 'data_sampling': {'enabled': False, 'num_epochs': 1000, 'num_workers': 0, 'curriculum_learning': {'enabled': False}}, 'data_routing': {'enabled': False, 'random_ltd': {'enabled': False, 'layer_token_lr_schedule': {'enabled': False}}}}
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   data_efficiency_enabled ...... False
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   dataloader_drop_last ......... False
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   disable_allgather ............ False
+[2023-09-15 16:27:10,923] [INFO] [config.py:971:print]   dump_state ................... False
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   dynamic_loss_scale_args ...... {'init_scale': 65536, 'scale_window': 100, 'delayed_shift': 2, 'consecutive_hysteresis': False, 'min_scale': 1e-10}
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   eigenvalue_enabled ........... False
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   eigenvalue_gas_boundary_resolution  1
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   eigenvalue_layer_name ........ bert.encoder.layer
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   eigenvalue_layer_num ......... 0
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   eigenvalue_max_iter .......... 100
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   eigenvalue_stability ......... 1e-06
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   eigenvalue_tol ............... 0.01
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   eigenvalue_verbose ........... False
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   elasticity_enabled ........... False
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   flops_profiler_config ........ {
+    "enabled": false,
+    "recompute_fwd_factor": 0.0,
+    "profile_step": 1,
+    "module_depth": -1,
+    "top_modules": 1,
+    "detailed": true,
+    "output_file": null
+}
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   fp16_auto_cast ............... False
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   fp16_enabled ................. True
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   fp16_master_weights_and_gradients  False
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   global_rank .................. 0
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   grad_accum_dtype ............. None
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   gradient_accumulation_steps .. 1
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   gradient_clipping ............ 1.0
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   gradient_predivide_factor .... 1.0
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   hybrid_engine ................ enabled=False max_out_tokens=512 inference_tp_size=1 release_inference_cache=False pin_parameters=True tp_gather_partition_size=8
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   initial_dynamic_scale ........ 65536
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   load_universal_checkpoint .... False
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   loss_scale ................... 0
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   memory_breakdown ............. False
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   mics_hierarchial_params_gather  False
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   mics_shard_size .............. -1
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   monitor_config ............... tensorboard=TensorBoardConfig(enabled=False, output_path='', job_name='DeepSpeedJobName') wandb=WandbConfig(enabled=False, group=None, team=None, project='deepspeed') csv_monitor=CSVConfig(enabled=False, output_path='', job_name='DeepSpeedJobName') enabled=False
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   nebula_config ................ {
+    "enabled": false,
+    "persistent_storage_path": null,
+    "persistent_time_interval": 100,
+    "num_of_version_in_retention": 2,
+    "enable_nebula_load": true,
+    "load_path": null
+}
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   optimizer_legacy_fusion ...... False
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   optimizer_name ............... None
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   optimizer_params ............. None
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   pipeline ..................... {'stages': 'auto', 'partition': 'best', 'seed_layers': False, 'activation_checkpoint_interval': 0}
+[2023-09-15 16:27:10,924] [INFO] [config.py:971:print]   pld_enabled .................. False
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   pld_params ................... False
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   prescale_gradients ........... False
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   scheduler_name ............... None
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   scheduler_params ............. None
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   sparse_attention ............. None
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   sparse_gradients_enabled ..... False
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   steps_per_print .............. inf
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   train_batch_size ............. 1
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   train_micro_batch_size_per_gpu  1
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   use_node_local_storage ....... False
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   wall_clock_breakdown ......... False
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   weight_quantization_config ... None
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   world_size ................... 1
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   zero_allow_untested_optimizer  True
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   zero_config .................. stage=2 contiguous_gradients=True reduce_scatter=True reduce_bucket_size=100000000 allgather_partitions=True allgather_bucket_size=100000000 overlap_comm=True load_from_fp32_weights=True elastic_checkpoint=False offload_param=None offload_optimizer=None sub_group_size=1,000,000,000 cpu_offload_param=None cpu_offload_use_pin_memory=None cpu_offload=None prefetch_bucket_size=50,000,000 param_persistence_threshold=100,000 model_persistence_threshold=sys.maxsize max_live_parameters=1,000,000,000 max_reuse_distance=1,000,000,000 gather_16bit_weights_on_model_save=False stage3_gather_fp16_weights_on_model_save=False ignore_unused_parameters=True legacy_stage1=False round_robin_gradients=False zero_hpz_partition_size=1 zero_quantized_weights=False zero_quantized_nontrainable_weights=False zero_quantized_gradients=False mics_shard_size=-1 mics_hierarchical_params_gather=False memory_efficient_linear=True pipeline_loading_checkpoint=False override_module_apply=True
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   zero_enabled ................. True
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   zero_force_ds_cpu_optimizer .. True
+[2023-09-15 16:27:10,925] [INFO] [config.py:971:print]   zero_optimization_stage ...... 2
+[2023-09-15 16:27:10,925] [INFO] [config.py:957:print_user_config]   json = {
+    "fp16": {
+        "enabled": true,
+        "loss_scale": 0,
+        "loss_scale_window": 100,
+        "initial_scale_power": 16,
+        "hysteresis": 2,
+        "min_loss_scale": 1e-10
+    },
+    "zero_optimization": {
+        "stage": 2,
+        "allgather_partitions": true,
+        "allgather_bucket_size": 1.000000e+08,
+        "overlap_comm": true,
+        "reduce_scatter": true,
+        "reduce_bucket_size": 1.000000e+08,
+        "contiguous_gradients": true
+    },
+    "gradient_accumulation_steps": 1,
+    "gradient_clipping": 1.0,
+    "steps_per_print": inf,
+    "train_batch_size": 1,
+    "train_micro_batch_size_per_gpu": 1,
+    "wall_clock_breakdown": false,
+    "bf16": {
+        "enabled": false
+    },
+    "zero_allow_untested_optimizer": true
+}
+[INFO|trainer.py:1686] 2023-09-15 16:27:10,925 >> ***** Running training *****
+[INFO|trainer.py:1687] 2023-09-15 16:27:10,925 >>   Num examples = 14,164
+[INFO|trainer.py:1688] 2023-09-15 16:27:10,925 >>   Num Epochs = 1
+[INFO|trainer.py:1689] 2023-09-15 16:27:10,925 >>   Instantaneous batch size per device = 1
+[INFO|trainer.py:1692] 2023-09-15 16:27:10,925 >>   Total train batch size (w. parallel, distributed & accumulation) = 1
+[INFO|trainer.py:1693] 2023-09-15 16:27:10,925 >>   Gradient Accumulation steps = 1
+[INFO|trainer.py:1694] 2023-09-15 16:27:10,925 >>   Total optimization steps = 14,164
+[INFO|trainer.py:1695] 2023-09-15 16:27:10,929 >>   Number of trainable parameters = 159,907,840
+{'loss': 2.6843, 'learning_rate': 2.352941176470588e-07, 'epoch': 0.0}
+  0%|                                                                                                               | 7/14164 [00:02<1:19:03,  2.98it/s][2023-09-15 16:27:14,116] [INFO] [loss_scaler.py:190:update_scale] [deepspeed] OVERFLOW! Rank 0 Skipping step. Attempted loss scale: 65536, but hysteresis is 2. Reducing hysteresis to 1
+{'loss': 3.9865, 'learning_rate': 2.1176470588235296e-06, 'epoch': 0.0}
+  0%|                                                                                                              | 16/14164 [00:05<1:20:57,  2.91it/s][2023-09-15 16:27:16,996] [INFO] [loss_scaler.py:183:update_scale] [deepspeed] OVERFLOW! Rank 0 Skipping step. Attempted loss scale: 65536, reducing to 32768
+{'loss': 2.8793, 'learning_rate': 4.235294117647059e-06, 'epoch': 0.0}
+{'loss': 2.8384, 'learning_rate': 6.588235294117648e-06, 'epoch': 0.0}
+  0%|▎                                                                                                             | 38/14164 [00:11<1:02:19,  3.78it/s][2023-09-15 16:27:22,874] [INFO] [loss_scaler.py:183:update_scale] [deepspeed] OVERFLOW! Rank 0 Skipping step. Attempted loss scale: 32768, reducing to 16384
+{'loss': 4.0225, 'learning_rate': 8.705882352941177e-06, 'epoch': 0.0}
+{'loss': 3.3662, 'learning_rate': 1.1058823529411766e-05, 'epoch': 0.0}
+{'loss': 2.793, 'learning_rate': 1.3411764705882354e-05, 'epoch': 0.0}
+{'loss': 2.9761, 'learning_rate': 1.5764705882352943e-05, 'epoch': 0.0}
+{'loss': 3.2541, 'learning_rate': 1.811764705882353e-05, 'epoch': 0.01}
+{'loss': 3.0898, 'learning_rate': 2.047058823529412e-05, 'epoch': 0.01}
+{'loss': 3.0025, 'learning_rate': 2.2823529411764707e-05, 'epoch': 0.01}
+  1%|▊                                                                                                            | 100/14164 [00:29<1:10:06,  3.34it/s][INFO|trainer.py:3081] 2023-09-15 16:27:40,640 >> ***** Running Evaluation *****
+[INFO|trainer.py:3083] 2023-09-15 16:27:40,640 >>   Num examples = 8068
+[INFO|trainer.py:3086] 2023-09-15 16:27:40,640 >>   Batch size = 1
+{'eval_loss': nan, 'eval_runtime': 535.6413, 'eval_samples_per_second': 15.062, 'eval_steps_per_second': 15.062, 'epoch': 0.01}
+{'loss': 3.4667, 'learning_rate': 2.5176470588235295e-05, 'epoch': 0.01}
+{'loss': 3.105, 'learning_rate': 2.7529411764705883e-05, 'epoch': 0.01}
+{'loss': 3.1727, 'learning_rate': 2.9882352941176474e-05, 'epoch': 0.01}
+{'loss': 2.9251, 'learning_rate': 3.223529411764706e-05, 'epoch': 0.01}
+{'loss': 2.8524, 'learning_rate': 3.458823529411765e-05, 'epoch': 0.01}
+{'loss': 3.3965, 'learning_rate': 3.6941176470588235e-05, 'epoch': 0.01}
+{'loss': 3.1585, 'learning_rate': 3.929411764705882e-05, 'epoch': 0.01}
+{'loss': 3.3816, 'learning_rate': 4.164705882352941e-05, 'epoch': 0.01}
+{'loss': 2.6457, 'learning_rate': 4.4000000000000006e-05, 'epoch': 0.01}
+{'loss': 3.381, 'learning_rate': 4.635294117647059e-05, 'epoch': 0.01}
+  1%|█▌                                                                                                             | 200/14164 [09:53<57:29,  4.05it/s][INFO|trainer.py:3081] 2023-09-15 16:37:04,864 >> ***** Running Evaluation *****
+[INFO|trainer.py:3083] 2023-09-15 16:37:04,865 >>   Num examples = 8068
+[INFO|trainer.py:3086] 2023-09-15 16:37:04,865 >>   Batch size = 1
+{'eval_loss': nan, 'eval_runtime': 532.2763, 'eval_samples_per_second': 15.158, 'eval_steps_per_second': 15.158, 'epoch': 0.01}
+  1%|█▌                                                                                                             | 200/14164 [18:46<57:29,  4.05it/s[INFO|trainer.py:2807] 2023-09-15 16:45:57,361 >> Saving model checkpoint to /root/autodl-tmp/workspace/peft-model/checkpoint-200
+[INFO|tokenization_utils_base.py:2210] 2023-09-15 16:45:57,611 >> tokenizer config file saved in /root/autodl-tmp/workspace/peft-model/checkpoint-200/tokenizer_config.json
+[INFO|tokenization_utils_base.py:2217] 2023-09-15 16:45:57,611 >> Special tokens file saved in /root/autodl-tmp/workspace/peft-model/checkpoint-200/special_tokens_map.json
+[2023-09-15 16:45:57,633] [INFO] [logging.py:96:log_dist] [Rank 0] [Torch] Checkpoint global_step200 is about to be saved!
+[2023-09-15 16:46:04,969] [INFO] [logging.py:96:log_dist] [Rank 0] Saving model checkpoint: /root/autodl-tmp/workspace/peft-model/checkpoint-200/global_step200/mp_rank_00_model_states.pt
+[2023-09-15 16:46:04,969] [INFO] [torch_checkpoint_engine.py:21:save] [Torch] Saving /root/autodl-tmp/workspace/peft-model/checkpoint-200/global_step200/mp_rank_00_model_states.pt...
+[2023-09-15 16:46:15,665] [INFO] [torch_checkpoint_engine.py:23:save] [Torch] Saved /root/autodl-tmp/workspace/peft-model/checkpoint-200/global_step200/mp_rank_00_model_states.pt.
+[2023-09-15 16:46:16,355] [INFO] [torch_checkpoint_engine.py:21:save] [Torch] Saving /root/autodl-tmp/workspace/peft-model/checkpoint-200/global_step200/zero_pp_rank_0_mp_rank_00_optim_states.pt...
+[2023-09-15 16:46:19,031] [INFO] [torch_checkpoint_engine.py:23:save] [Torch] Saved /root/autodl-tmp/workspace/peft-model/checkpoint-200/global_step200/zero_pp_rank_0_mp_rank_00_optim_states.pt.
+[2023-09-15 16:46:19,031] [INFO] [engine.py:3375:_save_zero_checkpoint] zero checkpoint saved /root/autodl-tmp/workspace/peft-model/checkpoint-200/global_step200/zero_pp_rank_0_mp_rank_00_optim_states.pt
+[2023-09-15 16:46:19,032] [INFO] [torch_checkpoint_engine.py:33:commit] [Torch] Checkpoint global_step200 is ready now!
+[INFO|tokenization_utils_base.py:2210] 2023-09-15 16:46:19,522 >> tokenizer config file saved in /root/autodl-tmp/workspace/peft-model/checkpoint-200/sft_lora_model/tokenizer_config.json
+[INFO|tokenization_utils_base.py:2217] 2023-09-15 16:46:19,522 >> Special tokens file saved in /root/autodl-tmp/workspace/peft-model/checkpoint-200/sft_lora_model/special_tokens_map.json
+{'loss': 2.8147, 'learning_rate': 4.870588235294118e-05, 'epoch': 0.01}
+{'loss': 3.0024, 'learning_rate': 5.105882352941177e-05, 'epoch': 0.02}
+{'loss': 3.3898, 'learning_rate': 5.341176470588235e-05, 'epoch': 0.02}
+{'loss': 2.8833, 'learning_rate': 5.576470588235294e-05, 'epoch': 0.02}
+  2%|█▉                                                                                                             | 246/14164 [19:20<59:18,  3.91it/s][2023-09-15 16:46:31,963] [INFO] [loss_scaler.py:190:update_scale] [deepspeed] OVERFLOW! Rank 0 Skipping step. Attempted loss scale: 65536, but hysteresis is 2. Reducing hysteresis to 1
+{'loss': 3.2368, 'learning_rate': 5.7882352941176474e-05, 'epoch': 0.02}
+{'loss': 3.0802, 'learning_rate': 6.0235294117647055e-05, 'epoch': 0.02}
+{'loss': 2.846, 'learning_rate': 6.258823529411765e-05, 'epoch': 0.02}
+{'loss': 3.3337, 'learning_rate': 6.494117647058824e-05, 'epoch': 0.02}
+  2%|██▏                                                                                                          | 283/14164 [19:31<1:09:06,  3.35it/s][2023-09-15 16:46:43,119] [INFO] [loss_scaler.py:183:update_scale] [deepspeed] OVERFLOW! Rank 0 Skipping step. Attempted loss scale: 65536, reducing to 32768
+{'loss': 3.6647, 'learning_rate': 6.705882352941176e-05, 'epoch': 0.02}
+{'loss': 2.4606, 'learning_rate': 6.941176470588236e-05, 'epoch': 0.02}
+  2%|██▎                                                                                                          | 300/14164 [19:36<1:02:58,  3.67it/s][INFO|trainer.py:3081] 2023-09-15 16:46:47,547 >> ***** Running Evaluation *****
+[INFO|trainer.py:3083] 2023-09-15 16:46:47,547 >>   Num examples = 8068
+[INFO|trainer.py:3086] 2023-09-15 16:46:47,547 >>   Batch size = 1
+{'eval_loss': nan, 'eval_runtime': 530.4092, 'eval_samples_per_second': 15.211, 'eval_steps_per_second': 15.211, 'epoch': 0.02}
+{'loss': 3.3246, 'learning_rate': 7.176470588235295e-05, 'epoch': 0.02}
+  2%|██▍                                                                                                         | 312/14164 [28:30<13:04:01,  3.40s/it][2023-09-15 16:55:41,203] [INFO] [loss_scaler.py:183:update_scale] [deepspeed] OVERFLOW! Rank 0 Skipping step. Attempted loss scale: 32768, reducing to 16384
+  2%|██▍                                                                                                          | 318/14164 [28:31<2:21:49,  1.63it/s][2023-09-15 16:55:42,651] [INFO] [loss_scaler.py:183:update_scale] [deepspeed] OVERFLOW! Rank 0 Skipping step. Attempted loss scale: 16384, reducing to 8192
+{'loss': 3.579, 'learning_rate': 7.364705882352942e-05, 'epoch': 0.02}
+{'loss': 3.0173, 'learning_rate': 7.6e-05, 'epoch': 0.02}
+{'loss': 3.1503, 'learning_rate': 7.835294117647059e-05, 'epoch': 0.02}
+{'loss': 3.1146, 'learning_rate': 8.070588235294118e-05, 'epoch': 0.02}
+{'loss': 3.3817, 'learning_rate': 8.305882352941177e-05, 'epoch': 0.03}
+{'loss': 2.9497, 'learning_rate': 8.541176470588236e-05, 'epoch': 0.03}
+{'loss': 2.71, 'learning_rate': 8.776470588235294e-05, 'epoch': 0.03}
+{'loss': 2.9474, 'learning_rate': 9.011764705882353e-05, 'epoch': 0.03}
+{'loss': 2.6447, 'learning_rate': 9.247058823529412e-05, 'epoch': 0.03}
+  3%|███▏                                                                                                           | 400/14164 [28:52<59:17,  3.87it/s][INFO|trainer.py:3081] 2023-09-15 16:56:03,823 >> ***** Running Evaluation *****
+[INFO|trainer.py:3083] 2023-09-15 16:56:03,823 >>   Num examples = 8068
+[INFO|trainer.py:3086] 2023-09-15 16:56:03,823 >>   Batch size = 1
+{'eval_loss': nan, 'eval_runtime': 530.551, 'eval_samples_per_second': 15.207, 'eval_steps_per_second': 15.207, 'epoch': 0.03}
+  3%|███▏                                                                                                           | 400/14164 [37:43<59:17,  3.87it/s[INFO|trainer.py:2807] 2023-09-15 17:04:54,586 >> Saving model checkpoint to /root/autodl-tmp/workspace/peft-model/checkpoint-400
+[INFO|tokenization_utils_base.py:2210] 2023-09-15 17:04:54,830 >> tokenizer config file saved in /root/autodl-tmp/workspace/peft-model/checkpoint-400/tokenizer_config.json
+[INFO|tokenization_utils_base.py:2217] 2023-09-15 17:04:54,830 >> Special tokens file saved in /root/autodl-tmp/workspace/peft-model/checkpoint-400/special_tokens_map.json
+[2023-09-15 17:04:54,852] [INFO] [logging.py:96:log_dist] [Rank 0] [Torch] Checkpoint global_step400 is about to be saved!
+[2023-09-15 17:05:02,181] [INFO] [logging.py:96:log_dist] [Rank 0] Saving model checkpoint: /root/autodl-tmp/workspace/peft-model/checkpoint-400/global_step400/mp_rank_00_model_states.pt
+[2023-09-15 17:05:02,181] [INFO] [torch_checkpoint_engine.py:21:save] [Torch] Saving /root/autodl-tmp/workspace/peft-model/checkpoint-400/global_step400/mp_rank_00_model_states.pt...
+Traceback (most recent call last):
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/serialization.py", line 441, in save
+    _save(obj, opened_zipfile, pickle_module, pickle_protocol)
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/serialization.py", line 668, in _save
+    zip_file.write_record(name, storage.data_ptr(), num_bytes)
+RuntimeError: [enforce fail at inline_container.cc:471] . PytorchStreamWriter failed writing file data/158: file write failed
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "run_clm_sft_with_peft.py", line 445, in <module>
+    main()
+  File "run_clm_sft_with_peft.py", line 418, in main
+    train_result = trainer.train(resume_from_checkpoint=checkpoint)
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/trainer.py", line 1539, in train
+    return inner_training_loop(
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/trainer.py", line 1901, in _inner_training_loop
+    self._maybe_log_save_evaluate(tr_loss, model, trial, epoch, ignore_keys_for_eval)
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/trainer.py", line 2237, in _maybe_log_save_evaluate
+    self._save_checkpoint(model, trial, metrics=metrics)
+  File "/root/miniconda3/lib/python3.8/site-packages/transformers/trainer.py", line 2298, in _save_checkpoint
+    self.model_wrapped.save_checkpoint(output_dir)
+  File "/root/miniconda3/lib/python3.8/site-packages/deepspeed/runtime/engine.py", line 3018, in save_checkpoint
+    self._save_checkpoint(save_dir,
+  File "/root/miniconda3/lib/python3.8/site-packages/deepspeed/runtime/engine.py", line 3224, in _save_checkpoint
+    self.checkpoint_engine.save(state, save_path)
+  File "/root/miniconda3/lib/python3.8/site-packages/deepspeed/runtime/checkpoint_engine/torch_checkpoint_engine.py", line 22, in save
+    torch.save(state_dict, path)
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/serialization.py", line 442, in save
+    return
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/serialization.py", line 291, in __exit__
+    self.file_like.write_end_of_file()
+RuntimeError: [enforce fail at inline_container.cc:337] . unexpected pos 3526655168 vs 3526655056
+  3%|███                                                                                                         | 400/14164 [37:57<21:46:21,  5.69s/it]
+ERROR:torch.distributed.elastic.multiprocessing.api:failed (exitcode: 1) local_rank: 0 (pid: 1536) of binary: /root/miniconda3/bin/python
+Traceback (most recent call last):
+  File "/root/miniconda3/bin/torchrun", line 8, in <module>
+    sys.exit(main())
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 346, in wrapper
+    return f(*args, **kwargs)
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/distributed/run.py", line 794, in main
+    run(args)
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/distributed/run.py", line 785, in run
+    elastic_launch(
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/distributed/launcher/api.py", line 134, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/root/miniconda3/lib/python3.8/site-packages/torch/distributed/launcher/api.py", line 250, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError:
+============================================================
+run_clm_sft_with_peft.py FAILED
+------------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2023-09-15_17:05:10
+  host      : autodl-container-7ae1118e3c-6205ffc5
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 1536)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
