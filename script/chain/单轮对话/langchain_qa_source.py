@@ -1,5 +1,6 @@
 import argparse
 import os
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--file_path', required=True, type=str)
 parser.add_argument('--embedding_path', required=True, type=str)
@@ -16,7 +17,7 @@ import torch
 from langchain import HuggingFacePipeline
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
-from langchain.document_loaders import TextLoader
+from langchain.document_loaders import TextLoader, DirectoryLoader
 from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
@@ -53,6 +54,7 @@ initial_qa_template = (
     " [/INST]"
 )
 
+
 def getDocSearch():
     textList = []
     for root, dir, files in os.walk(file_path):
@@ -66,40 +68,43 @@ def getDocSearch():
         chunk_size=600, chunk_overlap=100)
     documents = text_splitter.create_documents(textList)
     texts = text_splitter.split_documents(documents)
-   
+
     print("Loading the embedding model...")
     embeddings = HuggingFaceEmbeddings(model_name=embedding_path)
     docsearch = FAISS.from_documents(texts, embeddings)
     return docsearch
 
+
 if __name__ == '__main__':
     load_type = torch.float16
     if not torch.cuda.is_available():
         raise RuntimeError("No CUDA GPUs are available.")
-    #单文档
-#     loader = TextLoader(file_path)
-#     documents = loader.load()
-#     text_splitter = RecursiveCharacterTextSplitter(
-#         chunk_size=600, chunk_overlap=100)
-#     texts = text_splitter.split_documents(documents)
+    # 单文档
+    # loader = TextLoader(file_path)
+    # 多文档
+    loader = DirectoryLoader(file_path, glob='*.txt', show_progress=True, loader_cls=TextLoader)
+    documents = loader.load()
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=600, chunk_overlap=100)
+    texts = text_splitter.split_documents(documents)
 
-#     print("Loading the embedding model...")
-#     embeddings = HuggingFaceEmbeddings(model_name=embedding_path)
-#     docsearch = FAISS.from_documents(texts, embeddings)
-    #多文档
-    docsearch = getDocSearch()
+    print("Loading the embedding model...")
+    embeddings = HuggingFaceEmbeddings(model_name=embedding_path)
+    docsearch = FAISS.from_documents(texts, embeddings)
+    # 多文档
+    # docsearch = getDocSearch()
 
     print("loading LLM...")
     model = HuggingFacePipeline.from_model_id(model_id=model_path,
-            task="text-generation",
-            device=0,
-            model_kwargs={
-                          "torch_dtype" : load_type,
-                          "low_cpu_mem_usage" : True,
-                          "temperature": 0.2,
-                          "repetition_penalty":1.1,
-                            "max_length": 1000}
-            )
+                                              task="text-generation",
+                                              device=0,
+                                              model_kwargs={
+                                                  "torch_dtype": load_type,
+                                                  "low_cpu_mem_usage": True,
+                                                  "temperature": 0.2,
+                                                  "repetition_penalty": 1.1,
+                                                  "max_length": 1000}
+                                              )
 
     if args.chain_type == "stuff":
         PROMPT = PromptTemplate(
@@ -132,7 +137,7 @@ if __name__ == '__main__':
 
     while True:
         query = input("请输入问题：")
-        if len(query.strip())==0:
+        if len(query.strip()) == 0:
             break
         result = qa({"query": query})
         # print(qa.run(query))
