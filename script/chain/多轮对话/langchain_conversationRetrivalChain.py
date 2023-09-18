@@ -141,7 +141,11 @@ if __name__ == '__main__':
             template=initial_qa_template,
         )
         chain_type_kwargs = {"question_prompt": initial_qa_prompt, "refine_prompt": refine_prompt}
-        memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, k=3)
+        # 返回文档信息
+        memory = ConversationBufferMemory(memory_key="chat_history", input_key='question', output_key='answer',
+                                          return_messages=True, k=3)
+        # 不返回
+        # memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, k=3)
         qa = ConversationalRetrievalChain.from_llm(
             llm=model,
             chain_type='refine',
