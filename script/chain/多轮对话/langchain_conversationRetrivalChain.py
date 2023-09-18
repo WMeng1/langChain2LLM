@@ -142,7 +142,9 @@ if __name__ == '__main__':
         )
         chain_type_kwargs = {"question_prompt": initial_qa_prompt, "refine_prompt": refine_prompt}
         # 返回文档信息
-        memory = ConversationBufferMemory(memory_key="chat_history", input_key='question', output_key='answer',
+        # memory = ConversationBufferMemory(memory_key="chat_history", input_key='question', output_key='answer',
+        #                                   return_messages=True, k=3)
+        memory = ConversationBufferMemory(memory_key="chat_history", output_key='answer',
                                           return_messages=True, k=3)
         # 不返回
         # memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, k=3)
