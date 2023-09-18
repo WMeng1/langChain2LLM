@@ -15,9 +15,9 @@ model_path = args.model_path
 
 import torch
 from langchain import HuggingFacePipeline
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter, CharacterTextSplitter
 from langchain.vectorstores import FAISS
-from langchain.document_loaders import TextLoader
+from langchain.document_loaders import TextLoader, DirectoryLoader
 from langchain.prompts import PromptTemplate
 from langchain.chains import ConversationalRetrievalChain, RetrievalQA
 from langchain.memory.buffer import ConversationBufferMemory
@@ -66,33 +66,24 @@ initial_qa_template = (
 
 
 def getDocSearch():
-    textList = []
-    # 若传入文件是txt文件，则读取该文件
+    # 单文件
     if file_path.endswith('.txt'):
-        with open(file_path) as f:
-            text = f.read()
-            textList.append(text)
-    # 否则，读取文件夹下所有txt
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=600, chunk_overlap=100, length_function=len)
-    for root, dir, files in os.walk(file_path):
-        for file in files:
-            if file.endswith('.txt'):
-                path = os.path.join(root, file)
-                with open(file_path) as f:
-                    text = f.read()
-                    textList.append(text)
-    documents = text_splitter.create_documents(textList)
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=600, chunk_overlap=100)
-    texts = text_splitter.split_documents(documents)
-    loader = TextLoader(file_path)
-    documents = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=600, chunk_overlap=100)
-    texts = text_splitter.split_documents(documents)
-    print("Loading the embedding model...")
-    embeddings = HuggingFaceEmbeddings(model_name=embedding_path)
-    docsearch = FAISS.from_documents(texts, embeddings)
+        loader = TextLoader(file_path)
+        documents = loader.load()
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=600, chunk_overlap=100)
+        texts = text_splitter.split_documents(documents)
+        print("Loading the embedding model...")
+        embeddings = HuggingFaceEmbeddings(model_name=embedding_path)
+        docsearch = FAISS.from_documents(texts, embeddings)
+    # 多文件
+    else:
+        loader = DirectoryLoader("docs/extras/modules/", glob="*.txt")
+        documents = loader.load()
+        text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+        texts = text_splitter.split_documents(documents)
+        embeddings = HuggingFaceEmbeddings(model_name=embedding_path)
+        docsearch = FAISS.from_documents(texts, embeddings)
     return docsearch
 
 
