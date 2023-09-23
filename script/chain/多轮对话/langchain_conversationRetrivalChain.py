@@ -14,6 +14,7 @@ embedding_path = args.embedding_path
 model_path = args.model_path
 
 import torch
+from langchain.llms import VLLM
 from langchain import HuggingFacePipeline
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
@@ -24,21 +25,21 @@ from langchain.memory.buffer import ConversationBufferMemory
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 import os, pdb
 
-# prompt_template = (
-#     "[INST] <<SYS>>\n"
-#     "You are a helpful assistant. 你是一个乐于助人的助手。请基于你的知识以及聊天历史记录用中文回答当前问题\n"
-#     "<</SYS>>\n\n"
-#     "这是聊天历史记录：{chat_history}\n"
-#     "这是本次问题：{question}\n [/INST]"
-# )
-
 prompt_template = (
     "[INST] <<SYS>>\n"
     "You are a helpful assistant. 你是一个乐于助人的助手。请基于你的知识以及聊天历史记录用中文回答当前问题\n"
     "<</SYS>>\n\n"
     "这是聊天历史记录：{chat_history}\n"
-    "{context}\n{question} [/INST]"
+    "这是本次问题：{question}\n [/INST]"
 )
+
+# prompt_template = (
+#     "[INST] <<SYS>>\n"
+#     "You are a helpful assistant. 你是一个乐于助人的助手。请基于你的知识以及聊天历史记录用中文回答当前问题\n"
+#     "<</SYS>>\n\n"
+#     "这是聊天历史记录：{chat_history}\n"
+#     "{context}\n{question} [/INST]"
+# )
 
 
 # prompt_template = (
@@ -106,20 +107,34 @@ if __name__ == '__main__':
     print("loading doc...")
     docSearch = getDocSearch()
     print("loading LLM...")
-    model = HuggingFacePipeline.from_model_id(model_id=model_path,
-                                              task="text-generation",
-                                              device=0,
-                                              pipeline_kwargs={
-                                                "max_new_tokens": 400,
-                                                "do_sample": True,
-                                                "temperature": 0.2,
-                                                "top_k": 40,
-                                                "top_p": 0.9,
-                                                "repetition_penalty": 1.1},
-                                              model_kwargs={
-                                                    "torch_dtype": load_type,
-                                                    "low_cpu_mem_usage": True}
-                                             )
+    model = VLLM(model=model_path,
+                 trust_remote_code=True,  # mandatory for hf models
+                 max_new_tokens=128,
+                 top_k=40,
+                 top_p=0.9,
+                 temperature=0.8,
+    )
+    # model = HuggingFacePipeline.from_model_id(model_id=model_path,
+    #                                           task="text-generation",
+    #                                           device=0,
+    #                                           # model_kwargs={
+    #                                           #     "torch_dtype": load_type,
+    #                                           #     "low_cpu_mem_usage": True,
+    #                                           #     "temperature": 1,
+    #                                           #     "max_length": 4096,
+    #                                           #     "repetition_penalty": 1.1}
+    #                                           # )
+    #                                           pipeline_kwargs={
+    #                                             "max_new_tokens": 2048,
+    #                                             "do_sample": True,
+    #                                             "temperature": 0.2,
+    #                                             "top_k": 40,
+    #                                             "top_p": 0.9,
+    #                                             "repetition_penalty": 1.1},
+    #                                           model_kwargs={
+    #                                                 "torch_dtype": load_type,
+    #                                                 "low_cpu_mem_usage": True}
+    #                                          )
 
     if args.chain_type == "stuff":
         PROMPT = PromptTemplate.from_template(prompt_template)
