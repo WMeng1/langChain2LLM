@@ -1,5 +1,8 @@
 '''
 langchain自带的vllm测试
+    alpaca2可以推理
+    百川输出乱码，github上有同样的issue，说baichuan2-13B-chat没问题，7B-chat有问题
+    有人说是因为两个模型训练所使用的类有差异导致的
 '''
 
 import argparse
