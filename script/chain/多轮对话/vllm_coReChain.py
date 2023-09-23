@@ -171,5 +171,5 @@ if __name__ == '__main__':
         # print(qa.predict(input=query))
         #
         res = qa({'question':query})
-        print(res)
+        # print(res)
         print(res['answer'])
