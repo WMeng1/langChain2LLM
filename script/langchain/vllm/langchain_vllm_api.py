@@ -14,13 +14,23 @@ port = args.port
 host = args.host
 model_name = args.model_name
 
-prompt_template = (
-    "[INST] <<SYS>>\n"
-    "You are a helpful assistant. 你是一个乐于助人的助手。请基于你的知识以及聊天历史记录回答当前问题\n"
-    "<</SYS>>\n\n"
-    "这是聊天历史记录：{chat_history}\n"
-    "这是当前问题：{input}\n[/INST]"
-)
+if model_name == 'alpaca2':
+    prompt_template = (
+        "[INST] <<SYS>>\n"
+        "You are a helpful assistant. 你是一个乐于助人的助手。请基于你的知识以及聊天历史记录回答当前问题\n"
+        "<</SYS>>\n\n"
+        "这是聊天历史记录：{chat_history}\n"
+        "这是当前问题：{input}\n[/INST]"
+    )
+else:
+    # baichuan2的prompt依然不好用，依然乱码
+    prompt_template = (
+        "[INST] <<SYS>>\n"
+        "'role': 'user'\n"
+        "<</SYS>>\n\n"
+        "'history': {chat_history}"
+        "'content': {input}\n[/INST]"
+    )
 
 llm = VLLMOpenAI(
     openai_api_key="EMPTY",
