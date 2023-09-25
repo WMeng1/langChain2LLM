@@ -1,8 +1,3 @@
-'''
-    vllm基于openAI格式的api部署
-    langchain框架通过调用openAI接口的形式调用
-'''
-
 from langchain.llms import VLLMOpenAI, OpenAIChat
 from langchain.chains import ConversationChain
 from langchain.prompts import PromptTemplate
@@ -12,9 +7,12 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--port', default="10874", required=False, type=str)
 parser.add_argument('--host', default="localhost", required=False, type=str)
+# 模型部署别名
+parser.add_argument('--model_name', default="alpaca2", required=False, type=str)
 args = parser.parse_args()
 port = args.port
 host = args.host
+model_name = args.model_name
 
 prompt_template = (
     "[INST] <<SYS>>\n"
@@ -27,7 +25,7 @@ prompt_template = (
 llm = VLLMOpenAI(
     openai_api_key="EMPTY",
     openai_api_base="http://{}:{}/v1".format(host, port),
-    model_name="/root/autodl-tmp/workspace/models/lora-merged-model/",
+    model_name=model_name,
     max_tokens=512,
     top_p=0.9,
     temperature=0.2,

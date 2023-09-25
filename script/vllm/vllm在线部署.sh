@@ -14,7 +14,7 @@ curl http://localhost:10874/generate -d \
 }'
 
 # 在线部署，openAI格式的api
-python -m vllm.entrypoints.openai.api_server --model=/root/autodl-tmp/workspace/models/lora-merged-model/ --trust-remote-code --host=127.0.0.1 --port=10874
+python -m vllm.entrypoints.openai.api_server --model=/root/autodl-tmp/workspace/models/lora-merged-model/ --served-model-name=alpaca2 --trust-remote-code --host=127.0.0.1 --port=10874
 
 curl http://localhost:8000/v1/completions \
 -H "Content-Type: application/json" \
