@@ -29,3 +29,4 @@ curl http://localhost:8000/v1/completions \
   "max_tokens": 1024
 }'
 
+# --tensor-parallel-size 4 多gpu推理
