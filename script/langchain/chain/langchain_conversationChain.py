@@ -22,6 +22,7 @@ from langchain.document_loaders import TextLoader, DirectoryLoader
 from langchain.prompts import PromptTemplate
 from langchain.chains import ConversationalRetrievalChain, RetrievalQA
 from langchain.memory.buffer import ConversationBufferMemory
+from langchain.memory import ConversationSummaryMemory
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 import os, pdb
 
