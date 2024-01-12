@@ -19,11 +19,20 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.llms import VLLM
 from langchain.document_loaders import TextLoader, DirectoryLoader
+from langchain.vectorstores import Milvus
 from langchain.prompts import PromptTemplate
 from langchain.chains import ConversationalRetrievalChain, RetrievalQA
 from langchain.memory.buffer import ConversationBufferMemory
 from langchain.memory import ConversationSummaryMemory
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+from pymilvus import (
+    connections,
+    utility,
+    FieldSchema,
+    CollectionSchema,
+    DataType,
+    Collection,
+)
 import os, pdb
 
 prompt_template = (
@@ -172,4 +181,13 @@ if __name__ == '__main__':
         res = qa({'question':query})
         print(res)
         print(res['answer'])
-VLLM()
+
+        # 查询
+        conn = Collection("test1")
+        conn.load()
+        result = conn.query(expr="id==446785399793955564", output_fields=["id", "embedding"])
+        search_params = {
+            "metric_type": "COSINE",
+            "params": {"nprobe": 128},
+        }
+        result = conn.search(vec1, "embedding", search_params, limit=1, expr="id > 0", output_fields=["id", "name"])

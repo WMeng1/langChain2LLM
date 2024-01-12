@@ -81,6 +81,56 @@ class MultiHead(nn.Module):
         context = context.reshape((context.shape[0], context.shape[1], -1))
         return context  # [n, step, model_dim]
 
+class Test(nn.Module):
+    def __init__(self, n_head, model_dim, drop_rate) -> None:
+        super().__init__(n_head, model_dim, drop_rate)
+        self.n_head = n_head
+        self.model_dim = model_dim
+        self.head_dim = model_dim // n_head
+        self.drop_rate = drop_rate
+        self.wq = nn.Linear(model_dim, self.n_head * self.head_dim)
+        self.wk = nn.Linear(model_dim, self.n_head * self.head_dim)
+        self.wv = nn.Linear(model_dim, self.n_head * self.head_dim)
+
+        self.o_dense = nn.Linear(model_dim, model_dim)
+        self.o_drop = nn.Dropout(drop_rate)
+        self.layer_norm = nn.LayerNorm(model_dim)
+
+        self.attention = None
+
+    def forward(self, q, k, v, mask, training):
+        residule = q
+
+        q = self.wq(q)
+        k = self.wk(k)
+        v = self.wv(v)
+
+        query = self.split_heads(q)
+        key = self.split_heads(k)
+        value = self.split_heads(v)
+
+        context = self.scaled_dot_attention(query, key, value, mask)
+        o = self.o_dense(context)
+        o = self.o_drop(o)
+        o = self.layer_norm(residule + o)
+        return o
+
+
+    def split_heads(self, x):
+        x = torch.reshape(x, [x.shape[0], x.shape[1], self.n_head, self.head_dim])
+        return x.permute(0, 2, 1, 3)
+
+    def scaled_dot_attention(self, query, key, value, mask):
+        dk = torch.tensor(key.shape[-1]).type(torch.float16)
+        score = torch.matmul(query, key.permute(0, 1, 3, 2)) / (torch.sqrt(dk) + 1e+8)
+        if mask is not None:
+            score = score.masked_fill(mask, -np.inf)
+        self.attention = torch.softmax(score, dim=-1)
+        context = torch.matmul(self.attention, value)
+        context = context.permute(0, 2, 1, 3)
+        context = torch.reshape(context, [context.shape[0], context.shape[1], -1])
+        return context
+
 
 class PositionWiseFFN(nn.Module):
     def __init__(self, model_dim, dropout=0.0) -> None:
@@ -98,6 +148,8 @@ class PositionWiseFFN(nn.Module):
 
         o = self.layer_norm(x + o)
         return o
+
+
 
 
 class EncoderLayer(nn.Module):
@@ -172,9 +224,11 @@ class Transformer(nn.Module):
         self.encoder = Encoder(src_vocab, d_model, N, heads, drop_rate)
         self.decoder = Decoder(trg_vocab, d_model, N, heads, drop_rate)
         self.out = nn.Linear(d_model, trg_vocab)
+        self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, src, trg, src_mask, trg_mask):
         e_outputs = self.encoder(src, src_mask)
         d_output = self.decoder(trg, e_outputs, src_mask, trg_mask)
         output = self.out(d_output)
+        output = self.softmax(output)
         return output
