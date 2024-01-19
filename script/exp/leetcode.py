@@ -20,6 +20,51 @@ root.right = TreeNode(8)
 root.left.left = TreeNode(4)
 root.left.right = TreeNode(5)
 
+# 容器最大装水量
+def maxContains(height: List[int]) -> int:
+    left, right = 0, len(height) - 1
+    ans = 0
+    while left < right:
+        h = right - left
+        if height[left] < height[right]:
+            target = height[left] * h
+            left += 1
+        else:
+            target = height[right] * h
+            right -= 1
+        ans = target if target > ans else ans
+    return ans
+
+# 三数相加
+def threeSum(nums: List[int]) -> List[List[int]]:
+    ans = list()
+    n = len(nums)
+
+    nums.sort()
+    for first_idx in range(n):
+        second_idx = first_idx + 1
+        third_idx = n - 1
+        if first_idx > 0 and nums[first_idx] == nums[first_idx - 1]:
+            continue
+        if nums[first_idx] + nums[first_idx + 1] + nums[first_idx + 2] > 0:
+            break
+        if nums[first_idx] + nums[-2] + nums[-1] < 0:
+            continue
+        while second_idx < third_idx:
+            s = nums[first_idx] + nums[second_idx] + nums[third_idx]
+            if s > 0:
+                third_idx -= 1
+            elif s < 0:
+                second_idx += 1
+            else:
+                ans.append([nums[first_idx], nums[second_idx], nums[third_idx]])
+                second_idx += 1
+                while second_idx < third_idx and nums[second_idx] == nums[second_idx - 1]:
+                    second_idx += 1
+                third_idx -= 1
+                while second_idx < third_idx and nums[third_idx] == nums[third_idx + 1]:
+                    third_idx -= 1
+    return ans
 
 # 深度优先
 def dfs(root):
@@ -158,6 +203,55 @@ def findMin(nums:List[int]) -> int:
             right = pivot
     return nums[left]
 
+def mergeIntervals(intervals: List[List[int]]) -> List[List[int]]:
+    intervals.sort(key= lambda x: x[0])
+    ans = list()
+
+    for interval in intervals:
+        if ans and ans[-1][1] > interval[0]:
+            ans[-1] = [ans[-1][0], max(ans[-1][1], interval[1])]
+        else:
+            ans.append(interval)
+
+    return ans
+
+def generateBuckets(n):
+
+    ans = []
+    def reverseLoop(s, left, right):
+
+        if len(s) == 2 * n:
+            ans.append(s)
+            return
+        if left < n:
+            reverseLoop(s + '(', left+1, right)
+        if right < left:
+            reverseLoop(s + ')', left, right+1)
+    reverseLoop('', 0, 0)
+    return ans
+
+# 岛屿数量
+def numIslands(grid):
+
+    def dfs(grid, row, column):
+        grid[row][column] = 0
+        rows, columns = len(grid), len(grid[0])
+        l = [(row - 1, column), (row + 1, column), (row, column - 1), (row, column + 1)]
+        for x, y in l:
+            if 0 <= x < rows and 0 <= y < columns and grid[x][y] == '1':
+                dfs(grid, x, y)
+
+    if len(grid) == 0:
+        return 0
+    rows, columns = len(grid), len(grid[0])
+    ans = 0
+    for i in range(rows):
+        for j in range(columns):
+            if grid[i][j] == '1':
+                ans += 1
+                dfs(grid, i, j)
+    return ans
+
 
 if __name__ == '__main__':
     # dfs(root)
@@ -175,6 +269,14 @@ if __name__ == '__main__':
     # head = ListNode(0)
     # head.next = ListNode(1)
     # head.next.next = ListNode(2)
-    nums = [4, 5, 6, 7, 0, 1, 2]
-    findMin(nums)
+    # nums = [4, 5, 6, 7, 0, 1, 2]
+    # findMin(nums)
     # print(reverseChain(head, 2))
+
+    # print(maxContains([1, 8, 6, 2, 5, 4, 8, 3, 7]))
+    # nums = [-2, 0, 1, 1, 2]
+    # print(threeSum(nums))
+    # n = 3
+    # print(generateBuckets(n))
+    grid = [["1","1","0","0","0"],["1","1","0","0","0"],["0","0","1","0","0"],["0","0","0","1","1"]]
+    print(numIslands(grid))

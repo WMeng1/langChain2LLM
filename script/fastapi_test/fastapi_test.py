@@ -1,8 +1,12 @@
 import os
 import logging
+import asyncio
+import websockets
+import websockets_routes
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.templating import Jinja2Templates
+from langserve.server import add_routes
 from schemas import ChatResponse
 # from callback import StreamingLLMCallbackHandler
 from websockets.exceptions import ConnectionClosedOK
@@ -53,9 +57,11 @@ async def websocket_endpoint(websocket: WebSocket):
             #     }
             # )
             output = "测试websocket"
-
-            # Send the end-response back to the client
-            end_resp = ChatResponse(sender="bot", message=output, type="end")
+            for i in output:
+                # Send the end-response back to the client
+                stream_resp = ChatResponse(sender="bot", message=i, type="stream")
+                await websocket.send_json(stream_resp.dict())
+            end_resp = ChatResponse(sender="bot", message="", type="end")
             await websocket.send_json(end_resp.dict())
         except WebSocketDisconnect:
             logging.info("WebSocketDisconnect")
@@ -73,3 +79,16 @@ async def websocket_endpoint(websocket: WebSocket):
                 type="error",
             )
             await websocket.send_json(resp.dict())
+
+
+def router(x, y):
+    pass
+
+
+async def main():
+    # 启动WebSocket服务
+    async with websockets.serve(lambda x, y: router(x, y), "localhost", 8089):
+        await asyncio.Future()  # run forever
+
+def start():
+    asyncio.run(main)
